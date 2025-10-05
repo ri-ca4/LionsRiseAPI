@@ -1,5 +1,5 @@
 import React, {useState} from 'react';
-import {Text, View, TextInput, FlatList, Button} from 'react-native';
+import {Text, View, TextInput, FlatList, Button, KeyboardAvoidingView} from 'react-native';
 import { GlobalStyles } from './styles';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 
@@ -17,27 +17,52 @@ export default function App() {
     </View>
   );
 
+  const handleSend = () => {
+    // 1. Basic validation: don't send empty messages
+    if (inputText.trim() === '') {
+      return; 
+    };
+
+    const newMessage= {
+      id: Date.now().toString(),
+      text: inputText,
+      user: 'You',
+    };
+
+    setMessages(previousMessages => [newMessage, ...previousMessages]); 
+
+    setInputText('');
+
+  }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={GlobalStyles.container}>
-        <FlatList
-          data={messages}
-          renderItem={renderMessage}
-          keyExtractor={item => item.id}
-          inverted={true}
-        />
-        <View style={GlobalStyles.inputArea}>
-          <TextInput
-            style={GlobalStyles.input}
-            placeholder='Start typing here...'
-            value={inputText}
-            onChangeText={setInputText}
+        <KeyboardAvoidingView 
+          style={GlobalStyles.keyboardAvoiding} 
+          behavior={'height'} // Simplified for Android
+          // You can try removing this line if 'height' doesn't work perfectly:
+          keyboardVerticalOffset={0} 
+        >
+          <FlatList
+            data={messages}
+            renderItem={renderMessage}
+            keyExtractor={item => item.id}
+            inverted={true}
           />
-          <Button
-            title="Send"
-            onPress={()=> console.log('Send Pressed!')}
-          />
-        </View>
+          <View style={GlobalStyles.inputArea}>
+            <TextInput
+              style={GlobalStyles.input}
+              placeholder='Start typing here...'
+              value={inputText}
+              onChangeText={setInputText}
+            />
+            <Button
+              title="Send"
+              onPress={handleSend}
+            />
+          </View>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </SafeAreaProvider>
   );

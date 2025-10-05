@@ -33,4 +33,9 @@ export const GlobalStyles = StyleSheet.create({
     width: '80%',
     justifyContent: 'space-around',
   },
+  keyboardAvoiding: {
+    flex: 1, // Crucial: Makes the entire chat area fill all available space
+    width: '100%', // Ensures it takes up the full width
+    alignItems: 'center', // This centers the message bubbles inside the chat area!
+  },
 });
