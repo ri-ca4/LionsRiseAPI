@@ -2,6 +2,10 @@ import React, {useState} from 'react';
 import {Text, View, TextInput, FlatList, Button, KeyboardAvoidingView} from 'react-native';
 import { GlobalStyles } from './styles';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import { GEMINI_API_KEY } from '@env';
+
+const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
 
 export default function App() {
   const [inputText, setInputText] = useState('');
