@@ -23,17 +23,28 @@ export default function App() {
       return; 
     };
 
-    const newMessage= {
+    const userMessage= {
       id: Date.now().toString(),
       text: inputText,
       user: 'You',
     };
 
-    setMessages(previousMessages => [newMessage, ...previousMessages]); 
-
+    setMessages(previousMessages => [userMessage, ...previousMessages]); 
     setInputText('');
 
-  }
+    setTimeout(() => {
+      const geminiResponse = {
+        id: Date.now().toString() + 'g',
+        text: `Got it! You sent: "${inputText}". I'm simulating a reply now!`,
+        user: 'Gemini',
+      };
+
+      // We use the functional update form (previousMessages => ...) 
+      // because state updates inside setTimeout can sometimes rely on old values
+      setMessages(previousMessages => [geminiResponse, ...previousMessages]);
+    }, 1000); // 1000 milliseconds = 1 second delay
+
+  };
 
   return (
     <SafeAreaProvider>
