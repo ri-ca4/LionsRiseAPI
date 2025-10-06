@@ -38,4 +38,29 @@ export const GlobalStyles = StyleSheet.create({
     width: '100%', // Ensures it takes up the full width
     alignItems: 'center', // This centers the message bubbles inside the chat area!
   },
+  modelSelectionArea: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    padding: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+    backgroundColor: '#f9f9f9',
+  },
+    modelButton: {
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    minWidth: 80,
+    alignItems: 'center',
+  },
+  modelButtonSelected: {
+    backgroundColor: '#007AFF', // Blue highlight when selected
+  },
+  modelButtonUnselected: {
+    backgroundColor: '#E5E5EA', // Light gray when unselected
+  },
+  modelButtonText: {
+    color: 'black', // Default text color
+    fontWeight: '600',
+  }
 });

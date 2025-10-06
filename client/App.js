@@ -1,20 +1,24 @@
 import React, {useState} from 'react';
-import {Text, View, TextInput, FlatList, Button, KeyboardAvoidingView} from 'react-native';
+import {TouchableOpacity, Text, View, TextInput, FlatList, Button, KeyboardAvoidingView} from 'react-native';
 import { GlobalStyles } from './styles';
 import {SafeAreaProvider, SafeAreaView} from 'react-native-safe-area-context';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '@env';
 
 const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
-const chatModel = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+//const chatModel = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
 
 export default function App() {
   const [inputText, setInputText] = useState('');
-  const [messages, setMessages] = useState([
-    { id: '1', text: 'Hey there! Starting with the basics!', user: 'Gemini' },
-    { id: '2', text: 'This is much faster than I expected!', user: 'You' },
-  ]);
+  const [messages, setMessages] = useState([]);
+
+  const [selectedModel, setSelectedModel] = useState('gemini-2.5-flash');
+  const availableModels = [
+    {name: "2.5 Flash", value: 'gemini-2.5-flash'},
+    {name: "2.5 Pro", value: 'gemini-2.5-pro'},
+  ];
+
 
   const renderMessage = ({ item }) => (
     <View style={GlobalStyles.messageBubble}>
@@ -28,6 +32,8 @@ export default function App() {
     if (inputText.trim() === '') {
       return; 
     };
+
+    const currentModel = ai.getGenerativeModel({ model: selectedModel});
 
     const userMessage= {
       id: Date.now().toString(),
@@ -49,7 +55,7 @@ export default function App() {
 
 
     try {
-      const response = await chatModel.generateContent(messageForApi);
+      const response = await currentModel.generateContent(messageForApi);
       console.log("FULL API RESPONSE:", response); 
       const geminiResponseText = response.response.text();
 
@@ -81,10 +87,25 @@ export default function App() {
       <SafeAreaView style={GlobalStyles.container}>
         <KeyboardAvoidingView 
           style={GlobalStyles.keyboardAvoiding} 
-          behavior={'height'} // Simplified for Android
-          // You can try removing this line if 'height' doesn't work perfectly:
+          behavior={'height'} 
           keyboardVerticalOffset={0} 
         >
+          <View style={GlobalStyles.modelSelectionArea}>
+            {availableModels.map((model) => (
+              <TouchableOpacity
+                key={model.value}
+                onPress={()=> setSelectedModel(model.value)}
+                style={[
+                  GlobalStyles.modelButton,
+                  selectedModel === model.value ? GlobalStyles.modelButtonSelected : GlobalStyles.modelButtonUnselected
+                ]}
+              >
+                <Text style={GlobalStyles.modelButtonText}>
+                  {model.name.split(' ')[1]}
+                </Text>
+              </TouchableOpacity>
+            ))}
+          </View>
           <FlatList
             data={messages}
             renderItem={renderMessage}
