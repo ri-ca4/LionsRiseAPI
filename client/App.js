@@ -6,6 +6,8 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 import { GEMINI_API_KEY } from '@env';
 
 const ai = new GoogleGenerativeAI(GEMINI_API_KEY);
+const chatModel = ai.getGenerativeModel({ model: 'gemini-2.5-flash' });
+
 
 export default function App() {
   const [inputText, setInputText] = useState('');
@@ -21,7 +23,7 @@ export default function App() {
     </View>
   );
 
-  const handleSend = () => {
+  const handleSend = async () => {
     // 1. Basic validation: don't send empty messages
     if (inputText.trim() === '') {
       return; 
@@ -33,21 +35,45 @@ export default function App() {
       user: 'You',
     };
 
+    const messageForApi = inputText;
+
     setMessages(previousMessages => [userMessage, ...previousMessages]); 
-    setInputText('');
+    setInputText(''); 
+    
+    const thinkingMessage = {
+      id: Date.now().toString() + 'g',
+      text: 'Gemini is thinking...',
+      user: 'Gemini'
+    }
+    setMessages(previousMessages => [thinkingMessage, ...previousMessages]);
 
-    setTimeout(() => {
-      const geminiResponse = {
-        id: Date.now().toString() + 'g',
-        text: `Got it! You sent: "${inputText}". I'm simulating a reply now!`,
-        user: 'Gemini',
-      };
 
-      // We use the functional update form (previousMessages => ...) 
-      // because state updates inside setTimeout can sometimes rely on old values
-      setMessages(previousMessages => [geminiResponse, ...previousMessages]);
-    }, 1000); // 1000 milliseconds = 1 second delay
+    try {
+      const response = await chatModel.generateContent(messageForApi);
+      console.log("FULL API RESPONSE:", response); 
+      const geminiResponseText = response.response.text();
 
+      setMessages(previousMessages => {
+        const updatedMessages = previousMessages.filter(msg => msg.id !== thinkingMessage.id);
+
+        const geminiMessage = {
+          id: thinkingMessage.id,
+          text: geminiResponseText,
+          user: 'Gemini'
+        };
+
+        return [geminiMessage, ...updatedMessages];
+      })
+
+    } catch (error) {
+      console.error('GeminiAPI Error:', error);
+      const errorMessage = {
+        id: Date.now().toString() + 'e',
+        text: `Error: Could not connect to Gemini. Check your API key.`,
+        user: 'System'
+      }
+      setMessages(previousMessages => [errorMessage, ...previousMessages]);
+    }
   };
 
   return (
